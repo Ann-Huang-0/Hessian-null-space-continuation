@@ -1,0 +1,25 @@
+# Reward-preserving walk on the boat race (Fig. 4D-E; Appendix, "Settings of the boat race walks"):
+# keep the proxy return, and steer the KL divergence of the action distribution from the anchor's.
+task: boat_race
+anchor: 0               # PPO anchor data/anchors/boat_race/seed_<anchor>.pt (0-9)
+seed: 0
+preserve: reward        # reward: the surrogate return on a re-collected buffer | policy: the action logits
+data: {episodes: 32, explore: 0.25, gamma: 0.9}
+eval_episodes: 100
+
+direction:
+  type: steer
+  mu_rel: 1.0e-5
+  cg_iters: 50
+  cg_warm_start: true
+
+walk:
+  n_steps: 120
+  tau: 1.0e-4
+  restore_steps: 15
+  eta: 0.02
+  eta_min: 2.0e-3
+  grow: 2.0             # a halved step size recovers after accepted steps, up to eta
+  refresh_every: 3      # re-collect the buffer every 3 steps
+  save: 5
+  metrics_every: 5

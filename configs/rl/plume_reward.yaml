@@ -1,0 +1,26 @@
+# Reward-preserving walk on plume tracking (Fig. 4A-C; Appendix, "Settings of the plume-tracking walk"):
+# keep the surrogate return, maximize the difference of the mean actions from the anchor's.
+# Needs the plume simulator; see hnc/tasks/plume.py.
+task: plume
+anchor: 78f             # data/anchors/plume/<anchor>.pt: 78f (Fig. 4), 106c and 3c0
+seed: 0
+preserve: reward        # reward | policy (keep the mean actions, steer the RNN states)
+data: {episodes: 8}     # buffer of 8 stochastic episodes
+eval_conditions: 60
+
+direction:
+  type: steer
+  mu_rel: 1.0e-5
+  cg_iters: 50
+  cg_warm_start: true
+
+walk:
+  n_steps: 30
+  tau: 4.0e-4
+  restore_steps: 15
+  eta: 0.02
+  eta_min: 2.0e-3
+  grow: 2.0
+  refresh_every: 5      # re-collect the buffer every 5 steps
+  save: 5
+  metrics_every: 5

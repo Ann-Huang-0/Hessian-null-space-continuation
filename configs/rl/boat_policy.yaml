@@ -1,0 +1,24 @@
+# Policy-preserving walk on the boat race: keep the action logits on the anchor's states,
+# maximize the CKA distance of the last hidden layer from the anchor's.
+task: boat_race
+anchor: 0
+seed: 0
+preserve: policy
+data: {episodes: 32, explore: 0.25, gamma: 0.9}
+eval_episodes: 100
+
+direction:
+  type: steer
+  mu_rel: 1.0e-5
+  cg_iters: 50
+  cg_warm_start: true
+
+walk:
+  n_steps: 100
+  tau: 1.0e-3           # mean squared change of the logits
+  restore_steps: 15
+  eta: 0.02
+  eta_min: 2.0e-3
+  grow: 2.0
+  save: 5
+  metrics_every: 5

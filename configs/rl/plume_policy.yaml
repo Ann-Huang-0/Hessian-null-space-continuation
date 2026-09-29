@@ -1,0 +1,24 @@
+# Policy-preserving walk on plume tracking: keep the mean actions along the anchor's episodes,
+# maximize the CKA distance of the RNN states from the anchor's. Needs the plume simulator.
+task: plume
+anchor: 78f
+seed: 0
+preserve: policy
+data: {episodes: 8}
+eval_conditions: 60
+
+direction:
+  type: steer
+  mu_rel: 1.0e-5
+  cg_iters: 50
+  cg_warm_start: true
+
+walk:
+  n_steps: 60
+  tau: 1.0e-4           # mean squared change of the mean actions
+  restore_steps: 15
+  eta: 0.02
+  eta_min: 2.0e-3
+  grow: 2.0
+  save: 5
+  metrics_every: 5

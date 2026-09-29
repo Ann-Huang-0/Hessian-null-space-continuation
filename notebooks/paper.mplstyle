@@ -1,0 +1,62 @@
+# Paper figure style: small panels, large type, thick lines.
+figure.figsize:         2.6, 1.9
+figure.dpi:             150
+figure.autolayout:      False
+figure.titlesize:       11
+
+font.size:              10
+axes.titlesize:         10
+axes.labelsize:         10
+xtick.labelsize:        9
+ytick.labelsize:        9
+legend.fontsize:        9
+
+# Lines stay thick: a 2.0 pt trace in a 1.7 in panel survives print and projection.
+lines.linewidth:        2.0
+lines.markersize:       4.5
+lines.markeredgewidth:  1.2
+lines.dashed_pattern:   8, 4
+axes.linewidth:         1.0
+patch.linewidth:        1.0
+errorbar.capsize:       2
+
+xtick.major.size:       3.5
+xtick.major.width:      1.0
+xtick.minor.size:       2
+xtick.minor.width:      0.8
+ytick.major.size:       3.5
+ytick.major.width:      1.0
+ytick.minor.size:       2
+ytick.minor.width:      0.8
+xtick.direction:        out
+ytick.direction:        out
+
+# Tight padding buys panel area back for the data at this size.
+xtick.major.pad:        2
+ytick.major.pad:        2
+axes.labelpad:          2
+axes.titlepad:          3
+
+axes.spines.top:        False
+axes.spines.right:      False
+axes.grid:              False
+axes.axisbelow:         True
+
+# Legend carries entity names only, so it should be visually quiet and compact.
+legend.frameon:         False
+legend.handlelength:    1.4
+legend.handletextpad:   0.4
+legend.labelspacing:    0.25
+legend.columnspacing:   0.9
+legend.borderaxespad:   0.2
+legend.borderpad:       0.2
+
+# Soft charcoal ink instead of pure black: text and axes recede, data reads first.
+text.color:             3B3B38
+axes.edgecolor:         3B3B38
+axes.labelcolor:        3B3B38
+xtick.color:            3B3B38
+ytick.color:            3B3B38
+
+# Colour-blind-safe default cycle; named entities take their colours from figstyle.PAL
+axes.prop_cycle: cycler('color', ['3660AF', '709C3C', '912F52', 'C28412', '0393C2', 'BC5840', 'A46BBD', '08886D'])

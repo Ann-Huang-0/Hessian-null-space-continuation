@@ -1,0 +1,25 @@
+# CKA-steered walk of Fig. 2 (Appendix, "Settings of the CKA-steered walks").
+task: flipflop
+anchor: 0
+seed: 0                 # seed of the random first step (replicates use 0, 1, 2)
+preserve: function
+curvature: gauss_newton
+data: {trials: 128, time: 50}
+dtype: float64
+
+direction:
+  type: steer
+  objective: cka        # maximize 1 - CKA between the hidden states and the anchor's
+  probe_trials: 32      # the first 32 trials of the batch
+  mu_rel: 1.0e-7        # soft projection damping mu = mu_rel * lambda_max
+  cg_iters: 200
+  cg_warm_start: false
+
+walk:
+  n_steps: 600
+  tau: 1.0e-2
+  restore_steps: 12
+  eta: 0.03             # halved on rejection
+  eta_min: 5.0e-4       # the walk ends when no step above eta_min is accepted
+  save: 25
+  metrics_every: 10
