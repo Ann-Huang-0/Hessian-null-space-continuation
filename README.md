@@ -30,7 +30,7 @@ Recomputing DSA distances (not needed for the notebook) also requires the
 
 ## The method in code
 
-| Paper (Appendix, pseudocode) | Code |
+| Appendix pseudocode | Code |
 |---|---|
 | Algorithm 1, HNC | `hnc.walk` (`hnc/walk.py`) |
 | Algorithm 2, NullSpace | `hnc.curvature.null_space`: dense eigendecomposition for small models, LOBPCG otherwise |
