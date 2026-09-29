@@ -1,6 +1,6 @@
 # Hessian Null Space Continuation (HNC)
 
-Code for *Traversing the solution space of neural networks with Hessian Null Space Continuation*
+Code for **Traversing the solution space of neural networks with Hessian Null Space Continuation**<br>
 (Ann Huang, Mitchell Ostrow, Zhouyang Lu, Will Redman*, Leo Kozachkov*, Kanaka Rajan*).
 
 HNC moves a trained network through weight space while keeping its input-output mapping fixed. Each
@@ -9,7 +9,9 @@ a few gradient steps that restore the function. The walk can be undirected, or s
 with chosen properties, for example representations or dynamics that differ as much as possible from
 the network it started from.
 
-![HNC overview (Fig. 1 of the paper): flat null-space steps and function-restoring steps take the anchor to an alternative network with the same input-output mapping](assets/fig1.png)
+<p align="center">
+  <img src="assets/fig1.png" width="70%" alt="HNC overview (Fig. 1 of the paper): flat null-space steps and function-restoring steps take the anchor to an alternative network with the same input-output mapping">
+</p>
 
 ## Installation
 
