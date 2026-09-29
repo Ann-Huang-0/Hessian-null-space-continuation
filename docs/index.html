@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Hessian Null Space Continuation (HNC) traverses the weights that preserve a trained network's function, revealing many different internal mechanisms near a single solution.">
+  <meta name="keywords" content="Hessian Null Space Continuation, HNC, mode connectivity, neural representations, loss landscape">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Hessian Null Space Continuation">
+  <meta property="og:description" content="Traversing the solution space of neural networks with Hessian Null Space Continuation.">
+  <meta property="og:image" content="https://ann-huang-0.github.io/hessian-null-space-continuation/static/images/fig1.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Hessian Null Space Continuation</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,700|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <style>
+    body { background: #ffffff; color: #363636; }
+    .title.publication-title { font-size: 1.75rem; line-height: 1.25; }
+    @media (min-width: 769px) {
+      .title.publication-title { font-size: min(2rem, 3.1vw); }
+      .publication-title .title-line { white-space: nowrap; }
+    }
+    .title.publication-title { font-weight: 400; }
+    .title .title-name { font-weight: 700; color: #3b47b0; }
+    .publication-note { font-family: 'Google Sans', sans-serif; color: #555; }
+    .publication-links .button.is-static-soon { background: #f0f0f0; color: #7a7a7a; border: 1px dashed #b5b5b5; cursor: default; }
+    .result-figure { margin-top: 1.5rem; }
+    .result-figure img { width: 100%; height: auto; display: block; }
+    .teaser .hero-body > img { width: 80%; height: auto; display: block; margin-left: auto; margin-right: auto; }
+    .figure-caption { font-size: 1.05rem; color: #555; margin-top: 0.75rem; text-align: left; }
+    .section .content { font-size: 1.125rem; }
+    .teaser .subtitle.is-6 { font-size: 1.05rem; }
+    .method-steps { text-align: left; }
+    .method-steps li { margin-bottom: 0.5rem; }
+    .eq { font-family: Menlo, Consolas, monospace; background: #f5f5f5; padding: 0 0.35em; border-radius: 4px; white-space: nowrap; }
+    .section-eyebrow { font-family: 'Google Sans', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #1e968f; margin-bottom: 0.35rem; }
+  </style>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script>
+    // Largest title size (up to 48 px) at which each of the two lines fits, measured in the visitor's font.
+    function fitTitle() {
+      var h = document.querySelector('.publication-title');
+      if (!h) return;
+      if (window.innerWidth < 769) { h.style.fontSize = ''; return; }
+      h.style.fontSize = '100px';
+      var widest = Math.max.apply(null, Array.prototype.map.call(h.querySelectorAll('.title-line'),
+        function (l) { return l.getBoundingClientRect().width; }));
+      h.style.fontSize = Math.min(48, Math.floor(100 * h.clientWidth / widest * 0.98)) + 'px';
+    }
+    window.addEventListener('load', fitTitle);
+    window.addEventListener('resize', fitTitle);
+    if (document.fonts) document.fonts.ready.then(fitTitle);
+  </script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title"><span class="title-line">Traversing the solution space of neural networks</span><br><span class="title-line">with <span class="title-name">Hessian Null Space Continuation</span></span></h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Ann Huang<sup>1,2,3</sup>,</span>
+            <span class="author-block">Mitchell Ostrow<sup>4</sup>,</span>
+            <span class="author-block">Zhouyang Lu<sup>5</sup>,</span>
+            <span class="author-block">Will Redman<sup>6*</sup>,</span>
+            <span class="author-block">Leo Kozachkov<sup>5*</sup>,</span>
+            <span class="author-block">Kanaka Rajan<sup>2,3*</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Harvard University,</span>
+            <span class="author-block"><sup>2</sup>Harvard Medical School,</span>
+            <span class="author-block"><sup>3</sup>Kempner Institute,</span>
+            <span class="author-block"><sup>4</sup>MIT,</span>
+            <span class="author-block"><sup>5</sup>Brown University,</span>
+            <span class="author-block"><sup>6</sup>Johns Hopkins University</span>
+          </div>
+          <div class="is-size-6 publication-note"><sup>*</sup>Co-senior authors</div>
+          <div class="is-size-6 publication-note">annhuang@g.harvard.edu</div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- Paper link: point at the arXiv abstract once it is out. -->
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-static-soon">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper (coming soon)</span>
+                </span>
+              </span>
+              <!-- Code link. -->
+              <span class="link-block">
+                <a href="https://github.com/Ann-Huang-0/hessian-null-space-continuation"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="./static/images/fig1.png" width="1799" height="1096"
+           alt="Overview of HNC: from the trained anchor, flat null-space steps alternate with function-restoring steps across a low-loss region, reaching an alternative network with the same input-output mapping but different hidden-state representations.">
+      <h2 class="subtitle is-6 has-text-justified">
+        <strong>(A)</strong> Around a trained network (the anchor), the function-matching loss is sharp along a few directions
+        and flat along many. HNC follows the flat directions to an alternative network within the connected low-loss region.
+        <strong>(B)</strong> The two networks share the same input-output mapping, but their hidden-state representations of
+        the same inputs can differ. <strong>(C)</strong> The Hessian spectrum separates a few sharp directions from a
+        high-dimensional null space with eigenvalues below a threshold. <strong>(D)</strong> Each iteration takes a step within
+        the null space (flat step), then re-minimizes the function-matching loss (restore). <strong>(E)</strong> The flat step
+        can be steered to optimize a differentiable objective by following its gradient projected onto the null space.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            On a single task, deep neural networks can learn a wide range of solutions, depending on their optimizer, training
+            data, architecture, and hyperparameters. Many of these solutions are surprisingly <strong><em>mode-connected</em></strong>: rather than
+            isolated points in the weight space, they are connected by low loss regions. Despite this observation, the diversity of
+            solutions in terms of their internal computation in these regions has not been characterized. A parallel line of work
+            has identified the <strong><em>degeneracy of neural representations</em></strong>: many neural network solutions exist with similar
+            training loss yet distinct internal structures. However, it is unclear how these diverse solutions are related in
+            weight space. Here, we unify these subfields and demonstrate for the first time that there exist many different internal
+            mechanisms within a local mode connected region in weight space. To do so, we introduce <strong>Hessian Null Space Continuation
+            (HNC)</strong>, a scalable method that uses local curvature information to traverse regions of weight space that preserve network
+            function. HNC can additionally be steered toward solutions with specified properties.
+          </p>
+          <p>
+            In RNNs trained on a memory task, HNC drives the networks to learn drastically different representations and dynamics,
+            even with maintained behavior. In ImageNet-trained Vision Transformers, HNC finds alternative representations which differ
+            more from the original network than any independently trained models of different architectures and training objectives.
+            In reinforcement-learning agents, HNC uncovers a distinct behavioral strategy at comparable return in a navigation task,
+            and exposes a reward-hacking strategy in an AI Safety Gridworld environment. Finally, HNC provides local geometric
+            information about the solution distribution, showing how model size and task complexity shape its dimension and functional
+            sensitivity. Together, our results show that a surprisingly large amount of representational diversity exists near a
+            single trained solution, which is unseen by standard gradient-based optimization techniques. Our domain-agnostic method,
+            HNC, can identify and quantify this diversity, opening new possibilities for mechanistic understanding of solution spaces
+            and providing a principled basis for model merging, editing, and fine-tuning.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">How HNC works</h2>
+        <div class="content has-text-justified">
+          <p>
+            HNC keeps a function-matching loss, the mean squared difference between the alternative network's outputs and the
+            anchor's on a set of probe inputs. To find the null space, HNC computes the Hessian of this loss with
+            respect to the weights and takes the directions with the smallest eigenvalues, the flattest directions. Each iteration of HNC has three parts:
+          </p>
+          <ol class="method-steps">
+            <li><strong>Flat step.</strong> Take a small step within the current null space.</li>
+            <li><strong>Restore step.</strong> Take a few gradient steps on the function-matching loss to correct for
+              higher-order drift in the outputs induced by the preceding flat step.</li>
+            <li><strong>Relinearize.</strong> Recompute the null space when the loss rises above a threshold, which indicates that the
+              flat directions have changed as the walk moved away from the anchor.</li>
+          </ol>
+          <p>
+            For the flat step, the direction of the step can be chosen randomly from the null space. It can additionally be steered
+            to optimize an objective, such as the representational distance to the anchor, by following its gradient projected onto
+            the null space.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <p class="section-eyebrow">64-unit RNNs &middot; 3-bit flip-flop memory task</p>
+        <h2 class="title is-3">Different dynamics behind the same memory</h2>
+        <div class="content has-text-justified">
+          <p>
+            Every walk keeps the task loss below 0.01. Walks steered on representational (CKA) or dynamical (DSA) distance reach
+            much larger distances from the anchor than independently trained networks, with less weight movement. The anchor stores
+            its eight memories as stable fixed points at the corners of a cube; along the walks these fixed points split, multiply,
+            or disappear, and one undirected network keeps all eight memories while its hidden state never stops moving.
+          </p>
+        </div>
+        <div class="result-figure">
+          <img src="./static/images/fig2.png" width="1793" height="959" loading="lazy"
+               alt="Figure 2: the 3-bit flip-flop task, loss and distance to the anchor along undirected, CKA-steered and DSA-steered walks, state-space portraits of the networks reached, the undirected network's motion in the readout-null subspace, out-of-distribution memory tests, and MDS maps of the solutions.">
+          <p class="figure-caption"><strong>HNC walks from RNNs trained on a memory task.</strong> The task and the anchor's solution
+            (A), what the walks cost and what they change (B), where they end up (C), how the undirected network holds memories without
+            fixed points (D), memory and robustness beyond the trained conditions (E), and maps of the networks reached (F).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <p class="section-eyebrow">ViT-S/16 &middot; ImageNet</p>
+        <h2 class="title is-3">Representations further from the original than other trained models</h2>
+        <div class="content has-text-justified">
+          <p>
+            Steered to lower the highest CKA between any layer of the walked network and any layer of the pretrained anchor, while
+            keeping the anchor's predictions on the probe images, HNC reaches representations that differ more from the anchor than
+            those of seven independently trained models of other architectures and objectives. ImageNet top-1 accuracy drops by less
+            than one point, and the similarity structure among the images reorganizes.
+          </p>
+        </div>
+        <div class="result-figure">
+          <img src="./static/images/fig3.png" width="1799" height="979" loading="lazy"
+               alt="Figure 3: max-over-layers CKA and nearest-neighbor similarity to the anchor along the walk, prediction agreement and ImageNet accuracy, comparison with trained vision models, similarity structure of image representations, and attributes of the most similar image pairs.">
+          <p class="figure-caption"><strong>Representational freedom in a Vision Transformer.</strong> Similarity to the anchor falls
+            along the walk on both probe and held-out images (A) while predictions are kept (B), ending below the similarity of other
+            trained models (C); the similarity structure among images reorganizes (D-F).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <p class="section-eyebrow">PPO agents &middot; plume tracking and the AI Safety Gridworlds boat race</p>
+        <h2 class="title is-3">New strategies, and reward hacking, at the same return</h2>
+        <div class="content has-text-justified">
+          <p>
+            For RL agents, HNC preserves an importance-sampled estimate of the return on a buffer that is re-collected along the walk,
+            and steers the actions away from the anchor's. A plume-tracking agent learns to follow the edge of the odor plume instead of
+            surging into it and casting across the wind, at comparable return. In the boat race, walks from agents trained on the
+            intended objective uncover a policy that keeps the proxy reward by stepping on and off one arrow tile.
+          </p>
+        </div>
+        <div class="result-figure">
+          <img src="./static/images/fig4.png" width="1797" height="641" loading="lazy"
+               alt="Figure 4: plume-tracking trajectories of the anchor and alternative policy, action divergence and return along the walk, casting behavior, the boat race task, and proxy and true return along the walks.">
+          <p class="figure-caption"><strong>Behaviorally distinct policies at preserved return.</strong> Plume tracking (A-C), and the
+            boat race, where the true return that measures clockwise progress is hidden from the agent (D-E).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <p class="section-eyebrow">CNNs &middot; CIFAR-100 subsets of varying difficulty</p>
+        <h2 class="title is-3">A local measurement of the solution set</h2>
+        <div class="content has-text-justified">
+          <p>
+            The Hessian at the anchor and the curvature along the walk measure the solution set from a single trained network. The
+            fraction of flat directions grows with width and shrinks as the task gets harder, and the directions HNC follows become
+            more sensitive to weight changes on harder tasks.
+          </p>
+        </div>
+        <div class="result-figure" style="max-width: 560px; margin-left: auto; margin-right: auto;">
+          <img src="./static/images/fig5.png" width="1800" height="1418" loading="lazy"
+               alt="Figure 5: effective null fraction and normalized curvature along HNC walks as functions of network width and number of classes.">
+          <p class="figure-caption"><strong>Model size and task difficulty shape flatness and curvature.</strong> Effective null
+            fraction (A) and curvature along the walk (B) across network widths and numbers of image classes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{huang2026hnc,
+  title  = {Traversing the solution space of neural networks with Hessian Null Space Continuation},
+  author = {Huang, Ann and Ostrow, Mitchell and Lu, Zhouyang and Redman, Will and Kozachkov, Leo and Rajan, Kanaka},
+  year   = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/Ann-Huang-0/hessian-null-space-continuation" class="external-link">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Its source code is borrowed from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies website</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
