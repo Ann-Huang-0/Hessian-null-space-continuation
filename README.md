@@ -13,6 +13,8 @@ the network it started from.
   <img src="assets/fig1.png" width="70%" alt="HNC overview (Fig. 1 of the paper): flat null-space steps and function-restoring steps take the anchor to an alternative network with the same input-output mapping">
 </p>
 
+<br>
+
 ## Installation
 
 ```bash
@@ -23,6 +25,8 @@ pip install -e ".[notebook]"      # matplotlib, scikit-learn, jupyter, for the F
 
 Recomputing DSA distances (not needed for the notebook) also requires the
 [DSA package](https://github.com/mitchellostrow/DSA): `pip install git+https://github.com/mitchellostrow/DSA`.
+
+<br>
 
 ## The method in code
 
@@ -57,6 +61,8 @@ passed to `walk`. To preserve the task loss instead of the outputs, build the pr
 pass `hnc.RandomHeading(mu_rel=1e-3, method='lobpcg', k=64)` as the direction; any differentiable function
 of the weights can serve as a potential.
 
+<br>
+
 ## Reproducing Fig. 2
 
 ```bash
@@ -83,6 +89,8 @@ and set `WALKS` and `DSA` in the notebook to `runs/fig2`. On one GPU an undirect
 continues from its checkpoint when the same command is run again. The configs hold the settings of the
 paper (Appendix, walk hyperparameters) and preserve the function-matching loss of Eq. 1. 
 
+<br>
+
 ## Reinforcement learning
 
 `preserve: reward` keeps the return, through an importance-sampled surrogate on a buffer that is
@@ -107,6 +115,8 @@ instructions at the top of `hnc/tasks/plume.py`. Then
 python scripts/run_walk.py configs/rl/plume_reward.yaml --out runs/rl/plume_reward.pt
 ```
 
+<br>
+
 ## Configs
 
 A config names a task module in `hnc/tasks` and its settings, a `direction` block, and a `walk` block
@@ -126,6 +136,8 @@ whose keys are the arguments of `hnc.walk`:
 | `walk.refresh_every` | re-collect the RL buffer every this many steps |
 | `walk.save`, `metrics_every` | which weights to keep, and how often to evaluate the metrics |
 
+<br>
+
 ## Repository layout
 
 ```
@@ -139,6 +151,8 @@ data/fig2/      the walks and DSA distances behind Fig. 2 (task loss preserved)
 assets/         README figure
 ```
 
+<br>
+
 ## Citation
 
 ```bibtex
@@ -148,6 +162,8 @@ assets/         README figure
   year   = {2026}
 }
 ```
+
+<br>
 
 ## License
 
