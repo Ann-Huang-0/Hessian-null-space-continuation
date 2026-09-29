@@ -37,6 +37,16 @@
     .method-steps li { margin-bottom: 0.5rem; }
     .eq { font-family: Menlo, Consolas, monospace; background: #f5f5f5; padding: 0 0.35em; border-radius: 4px; white-space: nowrap; }
     .section-eyebrow { font-family: 'Google Sans', sans-serif; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: #1e968f; margin-bottom: 0.35rem; }
+    .rl-pair { display: flex; align-items: center; justify-content: center; gap: 1.5rem; }
+    .rl-pair .rl-media { flex: 0 1 56%; }
+    .rl-pair .rl-media.is-wide { flex-basis: 60%; }
+    .rl-pair .rl-plot { flex: 0 1 36%; }
+    .rl-pair img, .rl-pair video { width: 100%; height: auto; display: block; }
+    @media (max-width: 768px) {
+      .rl-pair { flex-direction: column; }
+      .rl-pair .rl-media, .rl-pair .rl-plot { flex-basis: auto; width: 100%; }
+      .rl-pair .rl-plot { max-width: 360px; }
+    }
   </style>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script>
@@ -260,10 +270,44 @@
           </p>
         </div>
         <div class="result-figure">
-          <img src="./static/images/fig4.png" width="1797" height="641" loading="lazy"
-               alt="Figure 4: plume-tracking trajectories of the anchor and alternative policy, action divergence and return along the walk, casting behavior, the boat race task, and proxy and true return along the walks.">
-          <p class="figure-caption"><strong>Behaviorally distinct policies at preserved return.</strong> Plume tracking (A-C), and the
-            boat race, where the true return that measures clockwise progress is hidden from the agent (D-E).</p>
+          <h3 class="title is-5">Plume tracking</h3>
+          <div class="rl-pair">
+            <div class="rl-media">
+              <video autoplay muted loop playsinline preload="auto" poster="./static/videos/plume_anchor_vs_hnc_poster.png" width="1000" height="1236">
+                <source src="./static/videos/plume_anchor_vs_hnc.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="rl-plot">
+              <img src="./static/images/rl_plume_return.png" width="767" height="535" loading="lazy"
+                   alt="Return along the plume-tracking walk, against relative weight change from the anchor.">
+            </div>
+          </div>
+          <p class="figure-caption"><strong>Same goal, different search strategy.</strong> Left: in three trials, the anchor and the HNC
+            alternative start from the same point (dark dot) in the same moving odor plume, and both reach the source. The anchor
+            zigzags across the wind whenever it loses the odor. The alternative glides in along the edge of the plume. Right: the
+            return along the walk stays at or above the anchor's (dotted horizontal line), and the dotted vertical line marks the
+            policy in the video. The rise in return comes from starting points that the anchor fails and the alternative solves.
+            Band: standard error over 60 starting points.</p>
+        </div>
+        <div class="result-figure">
+          <h3 class="title is-5">Boat race</h3>
+          <div class="rl-pair">
+            <div class="rl-media is-wide">
+              <video autoplay muted loop playsinline preload="auto" poster="./static/videos/boat_race_anchor_vs_hnc_poster.png" width="1280" height="880">
+                <source src="./static/videos/boat_race_anchor_vs_hnc.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="rl-plot">
+              <img src="./static/images/rl_boat_true_return.png" width="767" height="683" loading="lazy"
+                   alt="True return along ten boat race walks against relative weight change, colored by whether the endpoint follows the track or hacks the reward.">
+            </div>
+          </div>
+          <p class="figure-caption"><strong>Same proxy reward, different behavior.</strong> Left: an anchor trained on the true return
+            circles the track, while the endpoint of its HNC walk steps on and off one arrow tile. Both collect the same proxy return,
+            but only the anchor earns true return. Right: true return along the walks from ten anchors. Each walk holds the proxy
+            return and steers only the actions away from the anchor's, so it never sees the true return. Three of the ten walks end
+            in reward hacking. Every walk keeps the proxy return at 40 or more of the anchor's 50. Dotted line: the anchor's true
+            return.</p>
         </div>
       </div>
     </div>
