@@ -29,6 +29,7 @@
     .publication-links .button.is-static-soon { background: #f0f0f0; color: #7a7a7a; border: 1px dashed #b5b5b5; cursor: default; }
     .result-figure { margin-top: 1.5rem; }
     .result-figure img { width: 100%; height: auto; display: block; }
+    .result-figure video { width: 100%; height: auto; display: block; }
     .teaser .hero-body > img { width: 80%; height: auto; display: block; margin-left: auto; margin-right: auto; }
     .figure-caption { font-size: 1.05rem; color: #555; margin-top: 0.75rem; text-align: left; }
     .section .content { font-size: 1.125rem; }
@@ -36,18 +37,26 @@
     .method-steps { text-align: left; }
     .method-steps li { margin-bottom: 0.5rem; }
     .eq { font-family: Menlo, Consolas, monospace; background: #f5f5f5; padding: 0 0.35em; border-radius: 4px; white-space: nowrap; }
+    .walk-explorer { max-width: 600px; margin-left: auto; margin-right: auto; }
+    .walk-explorer img { width: 100%; height: auto; display: block; }
+    .walk-explorer input[type=range] { width: 66.7%; display: block; margin-left: 0; accent-color: #A46BBD; margin-top: 0.5rem; cursor: pointer; }
+    .walk-ends { width: 66.7%; display: flex; justify-content: space-between; font-size: 0.9rem; color: #777; }
+    .walk-label { width: 66.7%; font-family: 'Google Sans', sans-serif; font-size: 1.3rem; color: #3B3B38; text-align: center; margin-top: 0.25rem; }
     .section-eyebrow { font-family: 'Google Sans', sans-serif; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: #1e968f; margin-bottom: 0.35rem; }
     .rl-pair { display: flex; align-items: center; justify-content: center; gap: 1.5rem; }
-    .rl-pair .rl-media { flex: 0 1 56%; }
+    .rl-pair .rl-media { flex: 0 1 47.6%; }
     .rl-pair .rl-media.is-wide { flex-basis: 60%; }
     .rl-pair .rl-plot { flex: 0 1 36%; }
     .rl-pair img, .rl-pair video { width: 100%; height: auto; display: block; }
+    .rl-pair .rl-plot .rl-plot-main { width: 84.4%; margin: 0 auto; }         /* 647/767 px: same type scale as the boat plot */
+    .rl-pair .rl-plot .rl-plot-sub { width: 69.4%; margin: 0.75rem auto 0; }  /* 532/767 px: same type scale as the plot above */
     @media (max-width: 768px) {
       .rl-pair { flex-direction: column; }
       .rl-pair .rl-media, .rl-pair .rl-plot { flex-basis: auto; width: 100%; }
       .rl-pair .rl-plot { max-width: 360px; }
     }
   </style>
+  <link rel="stylesheet" href="./static/css/fig2f.css?v=3">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script>
     // Largest title size (up to 48 px) at which each of the two lines fits, measured in the visitor's font.
@@ -95,12 +104,13 @@
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- Paper link: point at the arXiv abstract once it is out. -->
+              <!-- Paper link: the preprint PDF; point at the arXiv abstract once it is out. -->
               <span class="link-block">
-                <span class="button is-normal is-rounded is-static-soon">
+                <a href="./static/paper/hnc_preprint.pdf" target="_blank" rel="noopener"
+                   class="external-link button is-normal is-rounded is-dark">
                   <span class="icon"><i class="fas fa-file-pdf"></i></span>
-                  <span>Paper (coming soon)</span>
-                </span>
+                  <span>Paper</span>
+                </a>
               </span>
               <!-- Code link. -->
               <span class="link-block">
@@ -123,14 +133,15 @@
     <div class="hero-body">
       <img src="./static/images/fig1.png" width="1799" height="1096"
            alt="Overview of HNC: from the trained anchor, flat null-space steps alternate with function-restoring steps across a low-loss region, reaching an alternative network with the same input-output mapping but different hidden-state representations.">
-      <h2 class="subtitle is-6 has-text-justified">
-        <strong>(A)</strong> Around a trained network (the anchor), the function-matching loss is sharp along a few directions
-        and flat along many. HNC follows the flat directions to an alternative network within the connected low-loss region.
-        <strong>(B)</strong> The two networks share the same input-output mapping, but their hidden-state representations of
-        the same inputs can differ. <strong>(C)</strong> The Hessian spectrum separates a few sharp directions from a
-        high-dimensional null space with eigenvalues below a threshold. <strong>(D)</strong> Each iteration takes a step within
-        the null space (flat step), then re-minimizes the function-matching loss (restore). <strong>(E)</strong> The flat step
-        can be steered to optimize a differentiable objective by following its gradient projected onto the null space.
+      <h2 class="subtitle is-6 has-text-justified" style="margin-top: 1.5rem;">
+        Around a trained network (the anchor), the loss landscape is sharp along a few directions but flat along many.
+        <strong style="color: #3b47b0;">HNC follows the flat directions in weight space to reach an alternative network that
+        computes the same input-output function with different internal representations</strong> (A-B). The Hessian of the loss
+        with respect to the weights measures the curvature of the loss landscape, so we define the null space as the weight
+        directions with the smallest Hessian eigenvalues, which are the flattest directions (C). To reach an
+        alternative solution, HNC alternates between a step within the null space (flat step) and a restore step that re-minimizes
+        the loss to recover the network's input-output function (D). We can additionally search for solutions with desired properties by steering HNC with an
+        objective function (E).
       </h2>
     </div>
   </div>
@@ -211,18 +222,58 @@
         <h2 class="title is-3">HNC drives RNNs to learn drastically different dynamics in a memory task</h2>
         <div class="content has-text-justified">
           <p>
-            Every walk keeps the task loss below 0.01. Walks steered on representational (CKA) or dynamical (DSA) distance reach
-            much larger distances from the anchor than independently trained networks, with less weight movement. The anchor stores
-            its eight memories as stable fixed points at the corners of a cube; along the walks these fixed points split, multiply,
-            or disappear, and one undirected network keeps all eight memories while its hidden state never stops moving.
+            We train RNNs on the canonical 3-Bit Flip-Flop (3BFF) task from computational neuroscience
+            (<a href="https://doi.org/10.1162/neco_a_00409" target="_blank" rel="noopener">Sussillo &amp; Barak, 2013</a>), in which networks maintain
+            three binary memories, each storing the last nonzero input on one input-output channel. After training, the networks
+            represented the 2<sup>3</sup> = 8 memory states as eight stable fixed points. Along the walks these fixed points split,
+            multiply, or disappear, all while the networks solve the task with 100% accuracy.
           </p>
         </div>
         <div class="result-figure">
-          <img src="./static/images/fig2.png" width="1793" height="959" loading="lazy"
-               alt="Figure 2: the 3-bit flip-flop task, loss and distance to the anchor along undirected, CKA-steered and DSA-steered walks, state-space portraits of the networks reached, the undirected network's motion in the readout-null subspace, out-of-distribution memory tests, and MDS maps of the solutions.">
-          <p class="figure-caption"><strong>HNC walks from RNNs trained on a memory task.</strong> The task and the anchor's solution
-            (A), what the walks cost and what they change (B), where they end up (C), how the undirected network holds memories without
-            fixed points (D), memory and robustness beyond the trained conditions (E), and maps of the networks reached (F).</p>
+          <video autoplay muted loop playsinline preload="auto" poster="./static/videos/fig2_task_poster.png" width="1920" height="600">
+            <source src="./static/videos/fig2_task.mp4" type="video/mp4">
+          </video>
+          <p class="figure-caption" style="margin-bottom: 3rem;"><strong>Same memory, different neural dynamics.</strong> The anchor and the three networks reached by HNC
+            walks receive the same input pulses, which step the memory through all eight states. Grey: hidden-state trajectories in each
+            network's top three principal components. Colored dot: the current hidden state, with a short trail. Diamonds: stable fixed
+            points. Lower left: the network's output on one channel (solid) against the target (dotted). The anchor jumps between fixed
+            points at the corners of a cube; the undirected network has no fixed points, and its state keeps moving while the output
+            holds.</p>
+        </div>
+        <div class="result-figure">
+          <div class="walk-explorer">
+            <img id="walk-img" src="./static/walk/step_000.webp" width="1200" height="800"
+                 alt="Hidden-state portrait and output of the network at the selected step of the undirected HNC walk.">
+            <input id="walk-slider" type="range" min="0" max="120" value="0" step="1" aria-label="Step along the undirected walk">
+            <div class="walk-ends"><span>anchor</span><span>endpoint</span></div>
+            <p class="walk-label" id="walk-label">step 0</p>
+          </div>
+          <p class="figure-caption" style="margin-bottom: 4.5rem;"><strong>Drag to see how the neural dynamics change along an undirected (unsteered) HNC walk!</strong> The anchor's fixed points disappear along the walk,
+            while its output (lower left, solid) closely matches the anchor's (dotted).</p>
+        </div>
+        <div class="result-figure">
+          <div class="f2f" id="f2f">
+            <div class="f2f-legend">
+              <span><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="#08886D" stroke-width="2.2"/></svg>anchor</span>
+              <span><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#A46BBD"/></svg>undirected</span>
+              <span><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#1B3F82"/></svg>CKA-steered</span>
+              <span><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#C28412"/></svg>DSA-steered</span>
+              <span><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#808080"/></svg>trained seeds</span>
+            </div>
+            <div class="f2f-map"><h4>CKA distance</h4>
+              <svg data-key="cka" role="img" aria-label="MDS map of the networks by representational distance; click a network to play its video."></svg></div>
+            <div class="f2f-map"><h4>&Vert;&Delta;&theta;&Vert;/&Vert;&theta;<sub>0</sub>&Vert;</h4>
+              <svg data-key="w" role="img" aria-label="MDS map of the networks by relative weight distance; click a network to play its video."></svg></div>
+            <div class="f2f-view">
+              <video autoplay muted loop playsinline preload="auto" width="540" height="600"></video>
+              <p class="f2f-label"></p>
+            </div>
+          </div>
+          <p class="figure-caption"><strong>Click a network in either map to watch it solve the task!</strong> Both maps show the same
+            131 networks: the anchor, ten independently trained networks, and every checkpoint of twelve HNC walks, embedded based on
+            either representational distance (left) or relative weight distance (right). In representation space, the HNC walks spread
+            much wider than independently trained networks and find a diversity of solutions within the connected low-loss region
+            around one trained network.</p>
         </div>
       </div>
     </div>
@@ -237,18 +288,26 @@
         <h2 class="title is-3">HNC reveals underexplored degrees of freedom in ViTs</h2>
         <div class="content has-text-justified">
           <p>
-            Steered to lower the highest CKA between any layer of the walked network and any layer of the pretrained anchor, while
-            keeping the anchor's predictions on the probe images, HNC reaches representations that differ more from the anchor than
-            those of seven independently trained models of other architectures and objectives. ImageNet top-1 accuracy drops by less
-            than one point, and the similarity structure among the images reorganizes.
+            How much representational freedom does a trained model have when its function is held nearly fixed? We take a ViT-S/16
+            pretrained on ImageNet and use HNC to search for the most different representations that keep its input-output mapping.
+            The walk is steered to lower the highest CKA similarity between any layer of the new network and any layer of the
+            pretrained anchor.
+          </p>
+          <p>
+            After changing the weights by only 1.3%, HNC reaches representations that differ more from the anchor
+            than those of independently trained models with other architectures and objectives. <strong>They are even less similar to the
+            anchor than a randomly initialized ViT is!</strong> The similarities between image representations also change drastically from
+            the anchor to the HNC endpoint.
           </p>
         </div>
         <div class="result-figure">
-          <img src="./static/images/fig3.png" width="1799" height="979" loading="lazy"
-               alt="Figure 3: max-over-layers CKA and nearest-neighbor similarity to the anchor along the walk, prediction agreement and ImageNet accuracy, comparison with trained vision models, similarity structure of image representations, and attributes of the most similar image pairs.">
-          <p class="figure-caption"><strong>Representational freedom in a Vision Transformer.</strong> Similarity to the anchor falls
-            along the walk on both probe and held-out images (A) while predictions are kept (B), ending below the similarity of other
-            trained models (C); the similarity structure among images reorganizes (D-F).</p>
+          <img src="./static/images/fig3.png?v=6" width="1800" height="1539" loading="lazy"
+               alt="Figure 3: max-over-layers CKA to the anchor for the HNC endpoint, an untrained ViT and seven trained vision models, and MDS maps of the probe images under the anchor and the HNC endpoint.">
+          <p class="figure-caption"><strong>Representational freedom in a Vision Transformer.</strong> Top: max-over-layers CKA to the
+            anchor for the HNC endpoint, an untrained ViT and seven independently trained models spanning different data, sizes,
+            objectives, recipes and architectures. Bottom: MDS embedding of penultimate-layer cosine similarities among 20 images from
+            four classes, under the anchor and the HNC endpoint. Throughout, the endpoint keeps the anchor's predictions on the probe
+            images.</p>
         </div>
       </div>
     </div>
@@ -263,14 +322,14 @@
         <h2 class="title is-3">HNC finds behaviorally distinct, high-reward policies in reinforcement learning</h2>
         <div class="content has-text-justified">
           <p>
-            For RL agents, HNC preserves an importance-sampled estimate of the return on a buffer that is re-collected along the walk,
-            and steers the actions away from the anchor's. A plume-tracking agent learns to follow the edge of the odor plume instead of
-            surging into it and casting across the wind, at comparable return. In the boat race, walks from agents trained on the
-            intended objective uncover a policy that keeps the proxy reward by stepping on and off one arrow tile.
+            In reinforcement learning, the scalar reward rarely fully specifies an optimal behavioral trajectory. This
+            underspecification therefore can admit many behaviorally distinct policies with similar reward level. We further extend
+            HNC to RL, where it preserves a surrogate reward while steering to maximize action divergence to find maximally different
+            behavioral policies.
           </p>
         </div>
         <div class="result-figure">
-          <h3 class="title is-5">Plume tracking</h3>
+          <h3 class="title is-4">Plume tracking</h3>
           <div class="rl-pair">
             <div class="rl-media">
               <video autoplay muted loop playsinline preload="auto" poster="./static/videos/plume_anchor_vs_hnc_poster.png" width="1000" height="1236">
@@ -278,19 +337,22 @@
               </video>
             </div>
             <div class="rl-plot">
-              <img src="./static/images/rl_plume_return.png" width="767" height="535" loading="lazy"
+              <img class="rl-plot-main" src="./static/images/rl_plume_return.png" width="647" height="535" loading="lazy"
                    alt="Return along the plume-tracking walk, against relative weight change from the anchor.">
+              <img class="rl-plot-sub" src="./static/images/rl_plume_centerline.png" width="532" height="541" loading="lazy"
+                   alt="Mean distance from the plume centerline for the HNC alternative against the anchor, one dot per starting point.">
             </div>
           </div>
-          <p class="figure-caption"><strong>Same goal, different search strategy.</strong> Left: in three trials, the anchor and the HNC
-            alternative start from the same point (dark dot) in the same moving odor plume, and both reach the source. The anchor
-            zigzags across the wind whenever it loses the odor. The alternative glides in along the edge of the plume. Right: the
-            return along the walk stays at or above the anchor's (dotted horizontal line), and the dotted vertical line marks the
-            policy in the video. The rise in return comes from starting points that the anchor fails and the alternative solves.
-            Band: standard error over 60 starting points.</p>
+          <p class="figure-caption"><strong>Same goal location, different navigation strategy.</strong> In the plume-tracking task, the
+            agent learns to navigate to the source of a turbulent odor plume in a windy 2D arena
+            (<a href="https://doi.org/10.1038/s42256-022-00599-w" target="_blank" rel="noopener">Singh et al., 2023</a>). The trained agent surges upwind when
+            it detects odor and sweeps back and forth across the odor centerline, just like real flies. Meanwhile, HNC finds an
+            alternative strategy that sweeps smoothly along the edge of the plume to reach the odor source, at comparable return. Top right:
+            the return along the walk stays at or above the anchor's (dotted horizontal line). Bottom right: the alternative stays
+            farther from the plume's centerline on every initial condition.</p>
         </div>
         <div class="result-figure">
-          <h3 class="title is-5">Boat race</h3>
+          <h3 class="title is-4">Boat race</h3>
           <div class="rl-pair">
             <div class="rl-media is-wide">
               <video autoplay muted loop playsinline preload="auto" poster="./static/videos/boat_race_anchor_vs_hnc_poster.png" width="1280" height="880">
@@ -302,12 +364,11 @@
                    alt="True return along ten boat race walks against relative weight change, colored by whether the endpoint follows the track or hacks the reward.">
             </div>
           </div>
-          <p class="figure-caption"><strong>Same proxy reward, different behavior.</strong> Left: an anchor trained on the true return
-            circles the track, while the endpoint of its HNC walk steps on and off one arrow tile. Both collect the same proxy return,
-            but only the anchor earns true return. Right: true return along the walks from ten anchors. Each walk holds the proxy
-            return and steers only the actions away from the anchor's, so it never sees the true return. Three of the ten walks end
-            in reward hacking. Every walk keeps the proxy return at 40 or more of the anchor's 50. Dotted line: the anchor's true
-            return.</p>
+          <p class="figure-caption"><strong>Same proxy reward, different behavior.</strong> In the boat race task
+            (<a href="https://arxiv.org/abs/1711.09883" target="_blank" rel="noopener">Leike et al., 2017</a>), the proxy reward gives
+            +3 for entering an arrow tile clockwise; the true return measures net clockwise progress around the track but is hidden
+            from the agent during standard training. The anchor follows the track as intended, while HNC exposes a reward-hacking
+            policy that steps on and off a single arrow tile, collecting the proxy reward without making clockwise progress.</p>
         </div>
       </div>
     </div>
@@ -318,20 +379,22 @@
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <p class="section-eyebrow">CNNs &middot; CIFAR-100 subsets of varying difficulty</p>
+        <p class="section-eyebrow">CNNs &middot; CIFAR-100 classification</p>
         <h2 class="title is-3">HNC measures loss landscape geometry</h2>
         <div class="content has-text-justified">
           <p>
-            The Hessian at the anchor and the curvature along the walk measure the solution set from a single trained network. The
-            fraction of flat directions grows with width and shrinks as the task gets harder, and the directions HNC follows become
-            more sensitive to weight changes on harder tasks.
+            HNC provides two complementary measures of loss-landscape geometry: the Hessian characterizes the local geometry at an
+            anchor, while the null space walk tracks how that geometry changes along a trajectory. We find that the relative dimension
+            of the Hessian null space (fraction of flat parameter directions) grows with model size and shrinks with task complexity.
+            Meanwhile, the directions HNC follows are also flatter in larger networks and higher-curvature on harder tasks.
           </p>
         </div>
         <div class="result-figure" style="max-width: 560px; margin-left: auto; margin-right: auto;">
           <img src="./static/images/fig5.png" width="1800" height="1418" loading="lazy"
                alt="Figure 5: effective null fraction and normalized curvature along HNC walks as functions of network width and number of classes.">
-          <p class="figure-caption"><strong>Model size and task difficulty shape flatness and curvature.</strong> Effective null
-            fraction (A) and curvature along the walk (B) across network widths and numbers of image classes.</p>
+          <p class="figure-caption"><strong>Model size and task difficulty shape local flatness and curvature.</strong> Effective null
+            fraction (A) and curvature along the walk (B) across network widths and numbers of image classes (our proxy of task
+            complexity).</p>
         </div>
       </div>
     </div>
@@ -372,5 +435,26 @@
   </div>
 </footer>
 
+<script>
+  // Undirected-walk slider: swap in the pre-rendered portrait of the chosen step.
+  (function () {
+    var img = document.getElementById('walk-img'), slider = document.getElementById('walk-slider'),
+        label = document.getElementById('walk-label'), frames = null;
+    var src = function (k) { return './static/walk/step_' + String(k).padStart(3, '0') + '.webp'; };
+    fetch('./static/walk/frames.json').then(function (r) { return r.json(); }).then(function (d) {
+      frames = d;
+      slider.max = d.steps.length - 1;
+      d.steps.forEach(function (_, k) { new Image().src = src(k); });   // preload every frame
+      update();
+    });
+    function update() {
+      var k = +slider.value;
+      img.src = src(k);
+      if (frames) label.textContent = 'step ' + frames.steps[k];
+    }
+    slider.addEventListener('input', update);
+  })();
+</script>
+<script src="./static/js/fig2f.js?v=2"></script>
 </body>
 </html>

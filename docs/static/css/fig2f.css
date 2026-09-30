@@ -1,0 +1,23 @@
+/* Interactive Fig 2F: two linked MDS maps and the selected network's task video. */
+.f2f { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 0.75rem; align-items: start; }
+.f2f-legend { grid-column: 1 / 3; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.2rem 1.1rem;
+  font-size: 0.95rem; color: #3B3B38; }
+.f2f-legend span { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+.f2f-legend svg { width: 12px; height: 12px; }
+.f2f-map { grid-row: 2; }
+.f2f-map h4 { font-family: 'Google Sans', sans-serif; font-weight: 400; font-size: 1.25rem; color: #3B3B38;
+  text-align: center; margin: 0 0 0.2rem; }
+.f2f-map svg { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: manipulation; }
+.f2f-map svg.is-over { cursor: pointer; }
+.f2f-map text { font-size: 13px; fill: #555; }
+.f2f-view { grid-column: 3; grid-row: 1 / 3; }
+.f2f-view video { width: 100%; height: auto; display: block; background: #fff; }
+.f2f-label { font-family: 'Google Sans', sans-serif; font-size: 1rem; color: #3B3B38; text-align: center; margin-top: 0.3rem;
+  line-height: 1.35; min-height: 2.7em; }
+.f2f-label .f2f-dist { color: #777; font-size: 0.9rem; }
+.f2f-hint { font-size: 0.9rem; color: #777; text-align: center; margin-top: 0.15rem; }
+@media (max-width: 768px) {
+  .f2f { grid-template-columns: 1fr 1fr; }
+  .f2f-legend { grid-column: 1 / 3; }
+  .f2f-view { grid-column: 1 / 3; grid-row: 3; max-width: 320px; margin: 0 auto; width: 100%; }
+}
